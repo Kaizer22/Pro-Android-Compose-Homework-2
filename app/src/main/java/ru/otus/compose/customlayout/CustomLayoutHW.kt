@@ -48,12 +48,12 @@ fun CustomLayoutHW(
                 val placeables = measurables.map { measurable ->
                     measurable.measure(itemConstraints)
                 }
-                val height = placeables.maxOf { it.height }
-                val width = placeables.maxOf { it.width }
+                val rowHeight = placeables.maxOf { it.height }
+                val columnWidth = placeables.maxOf { it.width }
 
                 layout(
-                    width * columns,
-                    height * rows,
+                    columnWidth * columns,
+                    rowHeight * rows,
                 ) {
                     for (i in 0 until rows) {
                         for (j in 0 until columns) {
@@ -62,13 +62,15 @@ fun CustomLayoutHW(
                                 break
                             }
                             placeables[currentPlaceable].place(
-                                x = width * j,
-                                y = height * i
+                                x = columnWidth * j,
+                                y = rowHeight * i,
                             )
                         }
                     }
                 }
-            } else { layout(0,0) {} }
+            } else {
+                layout(0, 0) {}
+            }
         }
     }
 }
