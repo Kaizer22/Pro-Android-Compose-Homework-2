@@ -25,42 +25,50 @@ fun CustomLayoutHW(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit = { }
 ) {
-    Layout(
-        modifier = modifier,
-        content = content,
-    ) { measurables, constraints ->
-        val itemsCount = measurables.size
-        val rows = itemsCount / columns +
-                (itemsCount % columns > 0).toInt()
-        val maxWidth = constraints.maxWidth / columns
-        val maxHeight = constraints.maxHeight / rows
-        val placeables = measurables.map { measurable ->
-            measurable.measure(
-                Constraints(
-                    maxWidth = maxWidth,
-                    maxHeight = maxHeight,
-                )
-            )
-        }
-        val heigh = placeables.maxOf { it.height }
-        val width = placeables.maxOf { it.width }
+    if (columns > 0) {
+        Layout(
+            modifier = modifier,
+            content = content,
+        ) { measurables, constraints ->
+            val itemsCount = measurables.size
 
-        layout(
-            width * columns,
-            heigh * rows,
-        ) {
-            for (i in 0 until rows) {
-                for (j in 0 until columns) {
-                    val currentPlaceable = i * columns + j
-                    if (currentPlaceable >= itemsCount) {
-                        break
-                    }
-                    placeables[currentPlaceable].place(
-                        x = heigh * j,
-                        y = width * i
-                    )
+            if (itemsCount > 0) {
+                val rows = itemsCount / columns +
+                        (itemsCount % columns > 0).toInt()
+
+                val itemMaxWidth = constraints.maxWidth / columns
+                val itemMaxHeight = constraints.maxHeight / rows
+                val itemConstraints = Constraints(
+                    maxWidth = itemMaxWidth,
+                    maxHeight = itemMaxHeight,
+                    minWidth = 0,
+                    minHeight = 0
+                )
+
+                val placeables = measurables.map { measurable ->
+                    measurable.measure(itemConstraints)
                 }
-            }
+                val height = placeables.maxOf { it.height }
+                val width = placeables.maxOf { it.width }
+
+                layout(
+                    width * columns,
+                    height * rows,
+                ) {
+                    for (i in 0 until rows) {
+                        for (j in 0 until columns) {
+                            val currentPlaceable = i * columns + j
+                            if (currentPlaceable >= itemsCount) {
+                                break
+                            }
+                            placeables[currentPlaceable].place(
+                                x = width * j,
+                                y = height * i
+                            )
+                        }
+                    }
+                }
+            } else { layout(0,0) {} }
         }
     }
 }
